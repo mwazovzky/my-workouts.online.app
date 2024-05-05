@@ -1,15 +1,17 @@
 <script setup>
-import axios from 'axios'
-import { reactive, onMounted } from 'vue'
+import { computed, inject, onMounted, reactive } from 'vue'
 
-axios.defaults.withCredentials = true
-axios.defaults.withXSRFToken = true
-axios.defaults.baseURL = 'http://localhost:8000'
+const http = inject('http')
 
 const state = reactive({})
 
+const name = computed(() => {
+  const str = state.name
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
+})
+
 onMounted(() => {
-  axios
+  http
     .get('/api/user')
     .then(({ data }) => {
       state.name = data.name
@@ -23,7 +25,7 @@ onMounted(() => {
 
 <template>
   <div class="greetings">
-    <h1 v-if="state.name" class="green">Hello, {{ state.name }}!</h1>
+    <h1 v-if="name" class="green">Hello, {{ name }}!</h1>
     <h3>
       You’ve successfully created a project with
       <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +

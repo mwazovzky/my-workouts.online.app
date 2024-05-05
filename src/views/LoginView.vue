@@ -1,12 +1,8 @@
 <script setup>
-import axios from 'axios'
-import { reactive } from 'vue'
+import { inject, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
-axios.defaults.withCredentials = true
-axios.defaults.baseURL = 'http://localhost:8000'
-axios.defaults.headers.common['Accept'] = 'application/json'
-axios.defaults.headers.common['Content-Type'] = 'application/json'
+const http = inject('http')
 
 const formData = reactive({
   email: '',
@@ -16,10 +12,10 @@ const formData = reactive({
 const router = useRouter()
 
 function submit() {
-  axios.get('/sanctum/csrf-cookie').then((response) => {
-    axios
+  http.get('/sanctum/csrf-cookie').then((response) => {
+    http
       .post('/login', { email: formData.email, password: formData.password })
-      .then((response) => router.push({ name: 'home' }))
+      .then(() => router.push({ name: 'home' }))
       .catch((error) => console.log(error))
   })
 }

@@ -1,18 +1,15 @@
 <script setup>
-import axios from 'axios'
-import { onMounted } from 'vue'
+import { inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-axios.defaults.withCredentials = true
-axios.defaults.withXSRFToken = true
-axios.defaults.baseURL = 'http://localhost:8000'
+const http = inject('http')
 
 const router = useRouter()
 
 function submit() {
-  axios
+  http
     .post('/logout')
-    .then((response) => router.push({ name: 'home' }))
+    .then(() => router.push({ name: 'home' }))
     .catch((error) => console.log(error))
 }
 
