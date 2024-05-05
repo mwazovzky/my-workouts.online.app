@@ -1,31 +1,24 @@
 <script setup>
-import { computed, inject, onMounted, reactive } from 'vue'
+import { inject, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 const http = inject('http')
-
-const state = reactive({})
-
-const name = computed(() => {
-  const str = state.name
-  return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
-})
+const authStore = useAuthStore()
 
 onMounted(() => {
   http
     .get('/api/user')
-    .then(({ data }) => {
-      state.name = data.name
-      state.email = data.email
-    })
+    .then(({ data }) => authStore.setName(data.name))
     .catch(({ response }) => {
-      console.error(response.status, response.data.message)
+      console.error(response.status, response.data)
+      authStore.setName(null)
     })
 })
 </script>
 
 <template>
   <div class="greetings">
-    <h1 v-if="name" class="green">Hello, {{ name }}!</h1>
+    <h1 v-if="authStore.getName" class="green">Hello, {{ authStore.getName }}!</h1>
     <h3>
       You’ve successfully created a project with
       <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +
