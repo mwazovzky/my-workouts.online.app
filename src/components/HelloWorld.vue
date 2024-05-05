@@ -1,15 +1,29 @@
 <script setup>
-defineProps({
-  msg: {
-    type: String,
-    required: true
-  }
+import axios from 'axios'
+import { reactive, onMounted } from 'vue'
+
+axios.defaults.withCredentials = true
+axios.defaults.withXSRFToken = true
+axios.defaults.baseURL = 'http://localhost:8000'
+
+const state = reactive({})
+
+onMounted(() => {
+  axios
+    .get('/api/user')
+    .then(({ data }) => {
+      state.name = data.name
+      state.email = data.email
+    })
+    .catch(({ response }) => {
+      console.error(response.status, response.data.message)
+    })
 })
 </script>
 
 <template>
   <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
+    <h1 v-if="state.name" class="green">Hello, {{ state.name }}!</h1>
     <h3>
       You’ve successfully created a project with
       <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +
