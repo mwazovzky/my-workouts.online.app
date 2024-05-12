@@ -1,23 +1,33 @@
 <script setup>
 import { inject, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import Error from '../components/Error.vue'
 
 const http = inject('http')
 
-const formData = reactive({
+const user = reactive({
   email: '',
   password: ''
+})
+
+const error = reactive({
+  message: ''
 })
 
 const router = useRouter()
 
 function submit() {
+  clearError()
   http.get('/sanctum/csrf-cookie').then((response) => {
     http
-      .post('/login', { email: formData.email, password: formData.password })
+      .post('/login', { email: user.email, password: user.password })
       .then(() => router.push({ name: 'home' }))
-      .catch((error) => console.log(error))
+      .catch(({ response }) => (error.message = response.data.message))
   })
+}
+
+function clearError() {
+  error.message = ''
 }
 </script>
 
@@ -29,15 +39,16 @@ function submit() {
     <form class="login-form" @submit.prevent>
       <div class="form-element">
         Email:
-        <input type="text" placeholder="email" v-model="formData.email" />
+        <input type="text" placeholder="email" v-model="user.email" />
       </div>
       <div class="form-element">
         Password:
-        <input type="password" placeholder="password" v-model="formData.password" />
+        <input type="password" placeholder="password" v-model="user.password" />
       </div>
       <div class="form-element">
         <button class="btn" @click="submit">Login</button>
       </div>
+      <Error :message="error.message" />
     </form>
   </div>
 </template>
